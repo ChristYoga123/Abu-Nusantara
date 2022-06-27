@@ -20,15 +20,12 @@ Route::get('/', function () {
 Auth::routes();
 
 
-Route::middleware('auth')->group(function () {
+Route::middleware('auth')->group(function () {  
     // Route User
     Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     
-    
-    
-    
     // Route Admin
-    Route::get('/admin/home', [App\Http\Controllers\AdminDashboardController::class, 'index'])->name('home');
+    Route::get('/admin/home', [App\Http\Controllers\AdminDashboardController::class, 'index'])->name('admin-home');
     Route::get('/admin/users', [\App\Http\Controllers\UserController::class, 'index'])->name('users.index');
     Route::resource('/admin/users/post', \App\Http\Controllers\UserPostController::class);
     Route::get('/admin/roles', [\App\Http\Controllers\RoleController::class, 'index'])->name('roles.index');
