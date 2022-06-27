@@ -1,0 +1,118 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Role;
+use Illuminate\Http\Request;
+
+class RolePostController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        //
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        $this->authorize('superadmin');
+        return view('roles.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $this->authorize('superadmin');
+        $validator = $request->validate([
+            'role_name' => 'required|unique:roles|max:255',
+            'role_description' => 'required',
+        ]);
+
+        $role = Role::create($validator);
+
+        return redirect()->route('roles.index')->with('success', 'Role berhasil ditambahkan.');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Role  $role
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Role $role, $id)
+    {
+        $this->authorize('superadmin');
+        $role = Role::findOrFail($id);
+
+        return view('roles.show', compact('role'), [
+            'role' => $role,
+        ]);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Models\Role  $role
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Role $role, $id)
+    {
+        $this->authorize('superadmin');
+        $role = Role::findOrFail($id);
+
+        return view('roles.edit', compact('role'), [
+            'role' => $role,
+        ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Role  $role
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, Role $role, $id)
+    {
+        $this->authorize('superadmin');
+        $role = Role::findOrFail($id);
+
+        $validator = $request->validate([
+            'role_name' => 'required|max:255|unique:roles,role_name,' . $role->id,
+            'role_description' => 'required',
+        ]);
+
+        Role::whereId($id)->update($validator);
+
+        return redirect()->route('roles.index')->with('success', 'Role berhasil diubah.');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Role  $role
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Role $role, $id)
+    {
+        $this->authorize('superadmin');
+        $role = Role::findOrFail($id);
+        $role->delete();
+
+        return redirect()->route('roles.index')->with('success', 'Role berhasil dihapus.');
+    }
+}
